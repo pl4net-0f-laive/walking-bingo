@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>산책 빙고</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Gmarket+Sans:wght@300;500;700&family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+
+  <main>
+    <header>
+      <h1 class="title">BINGO</h1>
+      <p class="subtitle">산책 빙고를 채워봐요.</p>
+    </header>
+    
+    <div class="board-wrap">
+      <div id="capture-area" class="capture-area">
+        <div class="capture-header">
+          <span class="capture-title"></span>
+          <span class="capture-score" id="cap-score">빙고 0줄</span>
+        </div>
+        <div id="board" class="board" role="grid" aria-label="빙고 보드"></div>
+        <div class="capture-footer"><a href="https://x.com/PL4NET_0F_LAIVE" target="_blank">made by @PL4NET_0F_LAIVE</a></div>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <button class="btn-action btn-reset" onclick="resetGame()" aria-label="새 게임 시작">
+        ↺ 새 게임
+      </button>
+      <div class="share-group">
+        <button class="btn-action btn-save" onclick="saveImage()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          이미지 저장
+        </button>
+        <button class="btn-action btn-x" onclick="shareTwitter()">
+          트위터에 공유
+        </button>
+      </div>
+    </div>
+
+    <div class="save-toast" id="save-toast" role="status" aria-live="polite">
+      ✓ 저장됨
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
