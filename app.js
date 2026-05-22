@@ -156,6 +156,13 @@ async function saveImage() {
   const el = document.getElementById('capture-area');
   const animatedCells = el.querySelectorAll('.bingo-new');
   animatedCells.forEach(cell => cell.classList.remove('bingo-new'));
+  const allCells = el.querySelectorAll('.cell');
+  const cellSize = allCells[0].offsetWidth + 'px';
+  allCells.forEach(cell => {
+    cell.style.width = cellSize;
+    cell.style.height = cellSize;
+    cell.style.aspectRatio = 'unset';
+  });
   await new Promise(resolve => setTimeout(resolve, 50));
   const canvas = await html2canvas(el, {
     backgroundColor: '#FFFBF6',
@@ -163,6 +170,11 @@ async function saveImage() {
     useCORS: true,
   });
   animatedCells.forEach(cell => cell.classList.add('bingo-new'));
+  allCells.forEach(cell => {
+    cell.style.width = '';
+    cell.style.height = '';
+    cell.style.aspectRatio = '';
+  });
   const now = new Date();
   const fileName = `bingo_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
 
