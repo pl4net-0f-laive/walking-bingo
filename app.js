@@ -186,7 +186,7 @@ async function saveImage() {
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-      body { margin: 0; background: #111; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: sans-serif; }
+      body { margin: 0; background: #FFF; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: sans-serif; }
       img { max-width: 100%; border-radius: 12px; }
       p { color: #aaa; font-size: 14px; margin-top: 16px; text-align: center; padding: 0 24px; }
     </style>
