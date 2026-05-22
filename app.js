@@ -154,6 +154,7 @@ function resetGame() {
 /* ---------- Image Save ---------- */
 async function saveImage() {
   const el     = document.getElementById('capture-area');
+  await new Promise(resolve => setTimeout(resolve, 500));
   const canvas = await html2canvas(el, {
     backgroundColor: '#FFFBF6',
     scale: 2,
