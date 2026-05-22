@@ -153,13 +153,16 @@ function resetGame() {
 
 /* ---------- Image Save ---------- */
 async function saveImage() {
-  const el     = document.getElementById('capture-area');
-  await new Promise(resolve => setTimeout(resolve, 500));
+  const el = document.getElementById('capture-area');
+  const animatedCells = el.querySelectorAll('.bingo-new');
+  animatedCells.forEach(cell => cell.classList.remove('bingo-new'));
+  await new Promise(resolve => setTimeout(resolve, 50));
   const canvas = await html2canvas(el, {
     backgroundColor: '#FFFBF6',
     scale: 2,
     useCORS: true,
   });
+  animatedCells.forEach(cell => cell.classList.add('bingo-new'));
   const now = new Date();
   const fileName = `bingo_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
 
