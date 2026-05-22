@@ -6,13 +6,14 @@ const ITEMS = [
   '고양이', '자전거', '어린이', '교회', '키링',
   '맨홀', '강아지', '화분', '새', '우체통',
   '놀이터', '버스', '비행기', '현수막', '운동기구',
-  '시계', '모자', '선글라스', 'SUV 차량', '커피',
+  '시계', '모자', '선글라스', 'SUV', '커피',
   '마스크', '유아차', '편의점', '학교', '쓰레기'
 ];
 
 let marked = Array(25).fill(false);
 let numbers = [];
 let bingoCells = new Set();
+let newBingoCells = new Set();
 
 /* ---------- Storage ---------- */
 
@@ -70,9 +71,11 @@ function getLines() {
 }
 
 function checkBingo() {
-  const lines    = getLines();
+  const lines = getLines();
+  const prevBingoCells = new Set(bingoCells);
   const complete = lines.filter(line => line.every(i => marked[i] || i === 12));
-  bingoCells     = new Set(complete.flat());
+  bingoCells = new Set(complete.flat());
+  newBingoCells = new Set([...bingoCells].filter(i => !prevBingoCells.has(i)));
   return complete.length;
 }
 
@@ -98,7 +101,7 @@ function renderBoard() {
       cell.setAttribute('aria-label', '중앙 칸 (자동 마킹)');
     } else if (isBingo) {
       cell.classList.add('bingo');
-      cell.setAttribute('aria-label', `${num} (빙고)`);
+      if (newBingoCells.has(i)) cell.classList.add('bingo-new');
     } else if (isMarked) {
       cell.classList.add('marked');
       cell.setAttribute('aria-label', `${num} (선택됨)`);
@@ -123,72 +126,80 @@ function toggleCell(i) {
   const bingoCount = checkBingo();
   renderBoard();
   updateUI(bingoCount);
-  save();
+  saveQuiet();
 }
 
 /* ---------- Toast ---------- */
 let toastTimer = null;
-function showToast() {
+function showToast(msg = '✓ 저장됨') {
   const toast = document.getElementById('save-toast');
+  toast.textContent = msg;
   toast.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.classList.remove('show'), 1500);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
 }
 
 /* ---------- Game Control ---------- */
 function resetGame() {
+  if (!confirm('정말로 새로 시작할까요?')) return;
   marked  = Array(25).fill(false);
   numbers = generateNumbers();
   bingoCells = new Set();
   renderBoard();
   updateUI(0);
   saveQuiet();
+  showToast('새로운 빙고판을 시작했어요.');
 }
 
 /* ---------- Image Save ---------- */
 async function saveImage() {
   const el     = document.getElementById('capture-area');
   const canvas = await html2canvas(el, {
-    backgroundColor: '#111118',
+    backgroundColor: '#FFFBF6',
     scale: 2,
     useCORS: true,
   });
-  const link      = document.createElement('a');
   const now = new Date();
   const fileName = `bingo_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
-  link.download = `${fileName}.png`;
-  link.href       = canvas.toDataURL('image/png');
-  link.click();
+
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  if (isIOS) {
+    const newTab = window.open();
+    newTab.document.write(`
+  <html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      body { margin: 0; background: #111; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: sans-serif; }
+      img { max-width: 100%; border-radius: 12px; }
+      p { color: #aaa; font-size: 14px; margin-top: 16px; text-align: center; padding: 0 24px; }
+    </style>
+  </head>
+  <body>
+    <img src="${canvas.toDataURL('image/png')}" />
+    <p>이미지를 꾹 눌러서 사진 보관함에 저장해주세요.🙌</p>
+  </body>
+  </html>
+`);
+  } else {
+    const link    = document.createElement('a');
+    link.download = `${fileName}.png`;
+    link.href     = canvas.toDataURL('image/png');
+    link.click();
+  }
 }
 
 /* ---------- Share ---------- */
 function getShareText() {
-  const n = checkBingo();
-  return `오늘의 산책 빙고: ${n}줄 달성!🚶‍♂️ #산책빙고`;
+  const bingoCount = checkBingo();
+  const checkedCount = marked.filter((v, i) => v && i !== 12).length;
+  return `🚶‍♂️오늘의 산책 빙고: ${bingoCount}줄 달성!(${checkedCount}/24) #라브_산책빙고`;
 }
 
 async function shareTwitter() {
-  // 1. 이미지 자동 저장
-  const el     = document.getElementById('capture-area');
-  const canvas = await html2canvas(el, {
-    backgroundColor: '#111118',
-    scale: 2,
-    useCORS: true,
-  });
-  const link    = document.createElement('a');
-  const now = new Date();
-  const fileName = `bingo_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
-  link.download = `${fileName}.png`;
-  link.href     = canvas.toDataURL('image/png');
-  link.click();
-
-  // 2. 잠깐 기다렸다가 트위터 공유창 열기
-  setTimeout(() => {
-    const text = encodeURIComponent(
-      getShareText() + '\n\n(이미지를 첨부해서 공유해보세요!)'
-    );
-    window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
-  }, 800);
+  alert('이미지 저장 후 함께 업로드해보세요.📸');
+  const text = encodeURIComponent(getShareText() + '\n https://pl4net-0f-laive.github.io/walking-bingo/');
+  window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
 }
 
 
