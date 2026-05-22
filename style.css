@@ -379,5 +379,5 @@ header {
 @media (max-width: 400px) {
   body { padding: 1.25rem 0.75rem 3rem; }
   .capture-area { padding: 1rem; }
-  .share-group { grid-template-columns: 1fr 1fr 1fr; }
+  .share-group { grid-template-columns: 1fr 1fr; }
 }
